@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import TaskItem from "./components/TaskItem";
 
 interface Task {
+  id: number;
   todo: string;
   completed: boolean;
 }
@@ -24,12 +25,17 @@ function App() {
     }
 
     const task = {
+      id: allTask.length + 1,
       todo: todo,
       completed: false,
     };
 
     setAllTasks((prev) => [...prev, task]);
     setTodo(""); // clear input
+  }
+
+  function handleDeleteTask(id: number) {
+    setAllTasks(allTask.filter((task) => task.id !== id));
   }
 
   return (
@@ -50,7 +56,7 @@ function App() {
 
         <ul className="space-y-2 divide-y">
           {allTask.map((task) => (
-            <TaskItem task={task} />
+            <TaskItem key={task.id} task={task} deleteTask={handleDeleteTask} />
           ))}
         </ul>
         {/* <p>{todo}</p> */}
