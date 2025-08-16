@@ -5,9 +5,10 @@ type Variant = "primary" | "danger";
 interface ButtonProps {
   children: React.ReactNode;
   variant?: Variant;
+  onClick?: React.MouseEventHandler<HTMLButtonElement>;
 }
 
-export default function Button({ children, variant }: ButtonProps) {
+export default function Button({ children, variant, onClick }: ButtonProps) {
   const base = "rounded";
 
   const variants: Record<Variant, string> = {
@@ -15,6 +16,8 @@ export default function Button({ children, variant }: ButtonProps) {
     danger: base + " text-red-500 text-xl",
   };
   return (
-    <button className={variant ? variants[variant] : base}>{children}</button>
+    <button className={variant ? variants[variant] : base} onClick={onClick}>
+      {children}
+    </button>
   );
 }
