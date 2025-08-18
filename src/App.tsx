@@ -2,6 +2,7 @@ import { IoMdAdd } from "react-icons/io";
 import Button from "./components/Button";
 import React, { useState } from "react";
 import TaskItem from "./components/TaskItem";
+import { addTask } from "./api/taskApi";
 
 interface Task {
   id: number;
@@ -31,6 +32,7 @@ function App() {
     };
 
     setAllTasks((prev) => [...prev, task]);
+    addTask(task);
     setTodo(""); // clear input
   }
 
