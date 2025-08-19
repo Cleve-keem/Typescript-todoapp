@@ -2,10 +2,10 @@ import { IoMdAdd } from "react-icons/io";
 import Button from "./components/Button";
 import React, { useEffect, useState } from "react";
 import TaskItem from "./components/TaskItem";
-import { addTask } from "./api/taskApi";
+import { addTask, getAllTask } from "./services/taskApi";
 
 interface Task {
-  id: number;
+  id?: number | string;
   todo: string;
   completed: boolean;
 }
@@ -17,24 +17,20 @@ function App() {
   useEffect(() => {
     async function fetchTasks() {
       try {
-        const response = await fetch("http://localhost:5000/api/tasks");
-        if (!response.ok) {
-          throw new Error("Failed to fetch tasks");
-        }
-        const data = await response.json();
+        let data = await getAllTask();
         setAllTasks(data);
       } catch (error) {
-        console.error("Error fetching tasks:", error);
+        console.error("Error getting all tasks:", error);
       }
     }
     fetchTasks();
-  }, [allTask]);
+  }, []);
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setTodo(e.target.value);
   }
 
-  function handleAddTask(e: React.FormEvent<HTMLFormElement>) {
+  async function handleAddTask(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
     if (todo.trim() === "") {
@@ -46,13 +42,9 @@ function App() {
       completed: false,
     };
 
-    // setAllTasks((prev) => [...prev, task]);
-    addTask(task);
-    setTodo(""); // clear input
-  }
-
-  function handleDeleteTask(id: number) {
-    setAllTasks(allTask.filter((task) => task.id !== id));
+    const newTask = await addTask(task);
+    setAllTasks((prev) => [...prev, newTask]);
+    setTodo("");
   }
 
   return (
@@ -72,11 +64,10 @@ function App() {
         </form>
 
         <ul className="space-y-2 divide-y">
-          {allTask.map((task) => (
-            <TaskItem key={task.id} task={task} deleteTask={handleDeleteTask} />
+          {allTask.map((task, i) => (
+            <TaskItem key={i} task={task}/>
           ))}
         </ul>
-        {/* <p>{todo}</p> */}
       </div>
     </div>
   );
