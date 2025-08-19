@@ -1,6 +1,6 @@
 import { IoMdAdd } from "react-icons/io";
 import Button from "./components/Button";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import TaskItem from "./components/TaskItem";
 import { addTask } from "./api/taskApi";
 
@@ -14,6 +14,22 @@ function App() {
   const [allTask, setAllTasks] = useState<Task[]>([]);
   const [todo, setTodo] = useState<string>("");
 
+  useEffect(() => {
+    async function fetchTasks() {
+      try {
+        const response = await fetch("http://localhost:5000/api/tasks");
+        if (!response.ok) {
+          throw new Error("Failed to fetch tasks");
+        }
+        const data = await response.json();
+        setAllTasks(data);
+      } catch (error) {
+        console.error("Error fetching tasks:", error);
+      }
+    }
+    fetchTasks();
+  }, [allTask]);
+
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setTodo(e.target.value);
   }
@@ -26,12 +42,11 @@ function App() {
     }
 
     const task = {
-      id: allTask.length + 1,
       todo: todo,
       completed: false,
     };
 
-    setAllTasks((prev) => [...prev, task]);
+    // setAllTasks((prev) => [...prev, task]);
     addTask(task);
     setTodo(""); // clear input
   }
