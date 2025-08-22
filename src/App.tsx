@@ -13,14 +13,22 @@ interface Task {
 function App() {
   const [allTask, setAllTasks] = useState<Task[]>([]);
   const [todo, setTodo] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string>("");
 
   useEffect(() => {
     async function fetchTasks() {
       try {
+        setIsLoading(true);
+        setError("");
+
         let data = await getAllTask();
         setAllTasks(data);
       } catch (error) {
-        console.error("Error getting all tasks:", error);
+        console.error("❌ Error getting all tasks:", error);
+        setError("❌ Failed Loading all tasks, try again later!");
+      } finally {
+        setIsLoading(false);
       }
     }
     fetchTasks();
@@ -42,8 +50,9 @@ function App() {
       completed: false,
     };
 
-    const newTask = await addTask(task);
-    setAllTasks((prev) => [...prev, newTask]);
+    const newTask: any = await addTask(task);
+    setAllTasks((prev) => [...prev, newTask.data]);
+    alert(newTask.message);
     setTodo("");
   }
 
@@ -62,12 +71,15 @@ function App() {
             <IoMdAdd />
           </Button>
         </form>
-
-        <ul className="space-y-2 divide-y">
-          {allTask.map((task, i) => (
-            <TaskItem key={i} task={task}/>
-          ))}
-        </ul>
+        {isLoading && <div>Loading...</div>}
+        {!isLoading && error && <div>{error}</div>}
+        {!isLoading && !error && (
+          <ul className="space-y-2 divide-y">
+            {allTask.map((task, i) => (
+              <TaskItem key={i} task={task} />
+            ))}
+          </ul>
+        )}
       </div>
     </div>
   );
