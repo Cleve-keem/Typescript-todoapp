@@ -2,7 +2,7 @@ const ENDPOINT_URL = import.meta.env.VITE_BACKEND_ENPOINT_URL;
 const API = ENDPOINT_URL + "/api/tasks";
 
 interface Task {
-  id?: string | number;
+  _id?: string;
   todo: string;
   completed: boolean;
 }
@@ -15,8 +15,6 @@ export async function getAllTask() {
     if (!res.ok) {
       throw new Error("Failed to fetch tasks");
     }
-
-    console.log(data);
 
     return data as Task[];
   } catch (err) {
@@ -47,7 +45,7 @@ export async function addTask(task: Task) {
   }
 }
 
-export async function deleteTask(id: any) {
+export async function deleteTask(id: string) {
   try {
     const res = await fetch(`${API}/${id}`, {
       method: "DELETE",
@@ -55,9 +53,33 @@ export async function deleteTask(id: any) {
 
     if (!res.ok) throw new Error("Failed to delete task");
 
-    return true;
+    const data = await res.json();
+
+    return data;
   } catch (err) {
     console.log("Error deleting task", err);
+    throw err;
+  }
+}
+
+export async function updateTask(
+  id: string | undefined,
+  update: Record<string, boolean>
+) {
+  try {
+    const res = await fetch(`${API}/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(update),
+    });
+
+    if (!res.ok) throw new Error("Failed to update task");
+
+    const data = await res.json();
+
+    return data;
+  } catch (err) {
+    console.log("Error updating task", err);
     throw err;
   }
 }

@@ -2,24 +2,37 @@ import { MdDelete } from "react-icons/md";
 import Button from "./Button";
 
 interface Task {
-  id?: number | string;
+  _id?: string | undefined;
   todo: string;
   completed: boolean;
 }
 
 interface TaskProps {
   task: Task;
-  deleteTask?: (id: string | number | undefined) => void;
+  deleteTask?: (id: string | undefined) => Promise<void>;
+  handleToggleCompleted: (id: string | undefined) => void;
 }
 
-export default function TaskItem({ task }: TaskProps) {
+export default function TaskItem({
+  task,
+  deleteTask,
+  handleToggleCompleted,
+}: TaskProps) {
   return (
-    <li className="flex justify-between items-center py-1">
+    <li className="flex justify-between items-center py-1 text-[18px]">
       <div className="flex items-center gap-2">
-        <input type="checkbox" name="checked" id="checked" className="" />
-        <span>{task.todo}</span>
+        <input
+          type="checkbox"
+          checked={task.completed}
+          className="size-4"
+          onChange={() => handleToggleCompleted(task._id)}
+        />
+
+        <span className={`${task.completed ? "line-through" : ""}`}>
+          {task.todo}
+        </span>
       </div>
-      <Button variant="danger">
+      <Button variant="danger" onClick={() => deleteTask?.(task._id)}>
         <MdDelete />
       </Button>
     </li>
